@@ -58,7 +58,7 @@ class PushCommand extends HyperfCommand
 //        \Swoole\Coroutine::
 //
 //        Co\run(function(){
-        $count = $this->input->getArgument('count') ?? 1;
+        $count = (int)$this->input->getArgument('count') ?? 1;
 
         $client = $msg = $ret = [];
         $concurrent = new Concurrent($count);
@@ -81,7 +81,7 @@ class PushCommand extends HyperfCommand
                 $this->line('Token: ' . $token);
 
 
-                $client[$i] = new Client(env('WS_CLIENT_HOST'), env('WS_CLIENT_PORT'), env('WS_CLIENT_SSL'));
+                $client[$i] = new Client(env('WS_CLIENT_HOST'), (int)env('WS_CLIENT_PORT'), (bool)env('WS_CLIENT_SSL'));
                 $ret[$i] = $client[$i]->upgrade("/?token=" . $token);
                 if ($ret[$i]) {
                     while (true) {
