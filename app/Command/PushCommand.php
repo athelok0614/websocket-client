@@ -88,7 +88,7 @@ class PushCommand extends HyperfCommand
 //
 //                 }   $client->push("hello");
                         $recv = $client[$i]->recv();
-                        $data = $recv->data;
+                        $data = $recv->data ?? '';
                         if (!empty($data)) {
                             var_dump($data);
                         }
