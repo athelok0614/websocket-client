@@ -59,12 +59,12 @@ class PushCommand extends HyperfCommand
 //
 //        Co\run(function(){
         $count = (int)$this->input->getArgument('count') ?? 1;
-
+        $connCount = 0;
         $client = $msg = $ret = [];
         $concurrent = new Concurrent($count);
         for ($i = 0; $i < $count; $i++) {
 
-            $concurrent->create(function () use ($client, $msg, $ret, $i) {
+            $concurrent->create(function () use ($client, $msg, $ret, $i, $connCount) {
 
                 $uid = mt_rand(1, 1000000);
                 $siteId = mt_rand(1, 3);
@@ -94,7 +94,13 @@ class PushCommand extends HyperfCommand
                         }
                         \Swoole\Coroutine::sleep(0.5);
                     }
+                }else{
+                    var_dump($client[$i]);
                 }
+
+
+                var_dump($ret[$i]);
+//                var_dump($client[$i]);
 
             });
         }
