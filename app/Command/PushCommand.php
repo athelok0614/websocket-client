@@ -62,9 +62,12 @@ class PushCommand extends HyperfCommand
         $connCount = 0;
         $client = $msg = $ret = [];
         $concurrent = new Concurrent($count);
-        for ($i = 0; $i < $count; $i++) {
 
-            $concurrent->create(function () use ($client, $msg, $ret, $i, $connCount) {
+
+
+            for ($i = 0; $i < $count; $i++) {
+                go(function () use ($client, $i, $msg, $ret, $count, $connCount) {
+//            $concurrent->create(function () use ($client, $msg, $ret, $i, $connCount) {
 
                 $uid = mt_rand(1, 1000000);
                 $siteId = mt_rand(1, 3);
@@ -78,11 +81,12 @@ class PushCommand extends HyperfCommand
                 ];
                 $token = $this->jwt->getToken($userInfo);
 
-                $this->line('Token: ' . $token);
+//                $this->line('Token: ' . $token);
 
-
+//                var_dump('in coroutine: '.json_encode(Coroutine::inCoroutine()));
                 $client[$i] = new Client(env('WS_CLIENT_HOST'), (int)env('WS_CLIENT_PORT'), (bool)env('WS_CLIENT_SSL'));
                 $ret[$i] = $client[$i]->upgrade("/?token=" . $token);
+//                var_dump('ret: '.json_encode($ret[$i]));
                 if ($ret[$i]) {
                     while (true) {
 //
@@ -92,22 +96,29 @@ class PushCommand extends HyperfCommand
                         if (!empty($data)) {
                             var_dump($data);
                         }
-                        \Swoole\Coroutine::sleep(0.5);
+
+//                        var_dump('in coroutine: '.json_encode(Coroutine::inCoroutine()));
+
+                        \Swoole\Coroutine::sleep(0.2);
                     }
-                }else{
-                    var_dump($client[$i]);
+                } else {
+//                    var_dump($client[$i]);
+                    var_dump($i.' failed');
                 }
 
 
-                var_dump($ret[$i]);
+//                var_dump($ret[$i]);
 //                var_dump($client[$i]);
 
-            });
-        }
+//            });
+                });
+            }
+
 //        });
     }
 
-    protected function getArguments(){
+    protected function getArguments()
+    {
         return [
             ['count', InputArgument::REQUIRED, '併發數']
         ];
